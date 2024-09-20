@@ -15,6 +15,7 @@
             animation: gradientWave 10s ease infinite;
             color: white;
             overflow: hidden;
+            cursor: url('ruta-del-cursor.gif'), auto; /* Cursor personalizado */
         }
 
         @keyframes gradientWave {
@@ -50,7 +51,13 @@
             cursor: pointer;
             position: absolute;
             transition: all 1s ease-in-out;
-            opacity: 1;
+            opacity: 0; /* Inicia con opacidad 0 para la animación */
+            animation: fadeIn 2s forwards; /* Animación de entrada */
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-100px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         img:hover {
@@ -70,24 +77,58 @@
             cursor: pointer;
             transition: background-color 0.3s;
             position: absolute;
-            bottom: 100px; /* Cambiado de 20px a 100px para subir el botón */
             left: 50%;
             transform: translateX(-50%);
+            margin: 10px; /* Añade margen para separarlos */
         }
 
-        button:hover {
-            background-color: #FFD700;
+        button:first-of-type {
+            bottom: 150px; /* Ajusta la posición del primer botón */
+        }
+
+        button:last-of-type {
+            bottom: 80px; /* Ajusta la posición del segundo botón */
+        }
+
+        /* Modal */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #modal-content {
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            color: black;
+        }
+
+        /* Texto que sigue al cursor */
+        #follow-text {
+            position: absolute;
+            pointer-events: none;
+            color: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>SurrealWave: La Marea del Caos</h1>
-        <button onclick="randomVideo()">????</button>
+        <button onclick="randomVideo()">( ˶°ㅁ°) !!????</button>
+        <button onclick="openModal()">¿Qué es esto?</button>
+
         <img id="img1" src="/imagenes/47X5.gif" alt="Bizarro 1" onclick="moveAndTransform('img1')">
         <img id="img2" src="/imagenes/art-weird.gif" alt="Bizarro 2" onclick="moveAndTransform('img2')">
         <img id="img3" src="/imagenes/WRx8.gif" alt="Bizarro 3" onclick="moveAndTransform('img3')">
-        <!-- Agrega más imágenes aquí si lo deseas -->
         <img id="img4" src="/imagenes/RUEX.gif" alt="Bizarro 4" onclick="moveAndTransform('img4')">
         <img id="img5" src="/imagenes/que-tengas-un-exclente-y-bendecido-flowers.gif" alt="Bizarro 5" onclick="moveAndTransform('img5')">
         <img id="img6" src="/imagenes/bang-cowboybebop.gif" alt="Bizarro 6" onclick="moveAndTransform('img6')">
@@ -98,6 +139,19 @@
         <img id="img11" src="/imagenes/smoking-cigarette.gif" alt="Bizarro 11" onclick="moveAndTransform('img11')">
         <img id="img12" src="imagenes/h2C.gif" alt="Bizarro 12" onclick="moveAndTransform('img12')">
     </div>
+
+    <!-- Modal -->
+    <div id="modal">
+        <div id="modal-content">
+            <p id="randomMessage">Este es un mensaje aleatorio.</p>
+            <button onclick="closeModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Texto que sigue al cursor -->
+    <div id="follow-text">¿A dónde vas?</div>
+
+    <audio id="soundEffect" src="ruta-del-sonido.mp3"></audio>
 
     <script>
         // Función para mover la imagen, cambiar su tamaño y hacerla aparecer/desaparecer
@@ -116,6 +170,15 @@
 
             // Alternar entre visible e invisible
             img.classList.toggle('invisible');
+
+            // Reproduce el sonido al hacer clic
+            playSound();
+        }
+
+        // Reproduce un sonido
+        function playSound() {
+            const sound = document.getElementById('soundEffect');
+            sound.play();
         }
 
         // Función para abrir un video de música aleatoria
@@ -124,11 +187,26 @@
                 'https://www.youtube.com/watch?v=kz9jhG963no&ab_channel=MacDeMarco', // Lofi
                 'https://www.youtube.com/watch?v=gMFQE05XRUE&ab_channel=OswaldoLobo', // Música clásica
                 'https://www.youtube.com/watch?v=JyNYkWKHf1Q&ab_channel=FantasticMusic',
-                'https://www.youtube.com/watch?v=Hti1jmkMrnU&t=396s&ab_channel=azure',//nujabees
+                'https://www.youtube.com/watch?v=Hti1jmkMrnU&t=396s&ab_channel=azure', // Nujabes
                 'https://www.youtube.com/watch?v=YOJsKatW-Ts&ab_channel=thebootlegboy'
             ];
             const randomIndex = Math.floor(Math.random() * videos.length);
             window.open(videos[randomIndex], '_blank');
+        }
+
+        // Función para abrir el modal con un mensaje aleatorio
+        function openModal() {
+            const messages = [
+                "El caos es el orden que no entendemos.",
+                "Todo lo que ves es una ilusión.",
+                "¿Realidad o sueño? Solo tú decides."
+            ];
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('randomMessage').innerText = messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
         }
 
         // Coloca las imágenes en posiciones aleatorias al cargar la página
@@ -136,6 +214,13 @@
             const images = document.querySelectorAll('img');
             images.forEach(img => {
                 moveAndTransform(img.id);
+            });
+
+            // Seguir el cursor con el texto
+            document.addEventListener('mousemove', function(e) {
+                const followText = document.getElementById('follow-text');
+                followText.style.left = e.pageX + 20 + 'px';
+                followText.style.top = e.pageY + 20 + 'px';
             });
         };
     </script>
